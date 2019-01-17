@@ -1,0 +1,12 @@
+- Select the helix of the antigen at the protein interface and define its neighbors.
+- Pack or relax the protein AND the antigen residues at the interface of the WT complex.
+- Of the selected neighbor residues, only pick the ones on the chain of the protein.
+- Find a way to patch the missing antigen loop(s) near the protein interface for a better representation of the interface.
+- Run alanine scanning on the selected residues to narrow down the residues that significantly matter for the interaction
+between the protein and the antigen.
+- Create a move map that allows all non-cysteine mutations {may include cysteine as well} at the selected protein positions.
+- Run the design algorithm:
+  - What should be the score function parameters?
+  - How should the jumps be defined?
+  - How should the resulting mutants be selected? {can check SASA at the interface and/or fa_rep, total score}
+  - As a control, can we dock the antigen to the WT and mutant proteins?
