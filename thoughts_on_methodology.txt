@@ -3,7 +3,7 @@
 - Of the selected neighbor residues, only pick the ones on the chain of the protein.
 - Find a way to patch the missing antigen loop(s) near the protein interface for a better representation of the interface.
 - Run alanine scanning on the selected residues to narrow down the residues that significantly matter for the interaction
-between the protein and the antigen.
+between the protein and the antigen {may be optional}.
 - Create a move map that allows all non-cysteine mutations {may include cysteine as well} at the selected protein positions.
 - Run the design algorithm:
   - What should be the score function parameters?
