@@ -29,10 +29,10 @@ fa_starting.assign(pose)
 fa_working = Pose()
 fa_working.assign(pose)
 # make a centroid pose
-switch = SwitchResidueTypeSetMover("centroid")
-switch.apply(pose)
-centroid = Pose()
-centroid.assign(pose)
+#switch = SwitchResidueTypeSetMover("centroid")
+#switch.apply(pose)
+#centroid = Pose()
+#centroid.assign(pose)
 
 ##################################################################
 ######################### DESIGN #################################
@@ -49,15 +49,26 @@ print(fa_working.pdb_info().pdb2pose('D', 72))
 
 
 # design only within 6A
-selectedResidues = pyrosetta.rosetta.core.select.residue_selector.ResidueRange()
-selectedResidues.set_start(51)
-selectedResidues.set_stop(68)
-print('this is it')
-print(selectedResidues)
+#selectedResidues = pyrosetta.rosetta.core.select.residue_selector.ResidueRange()
+#selectedResidues.set_start(51)
+#selectedResidues.set_stop(68)
 
-print(pyrosetta.rosetta.core.select.get_residues_from_subset(selectedResidues.apply(pose)))
+selector = pyrosetta.rosetta.core.select.residue_selector.ResidueIndexSelector()
+selector.set_index('51-68')
+print(selector.apply(pose))
+
+
+#
+#vec_test = pyrosetta.rosetta.core.select.get_residues_from_subset(selectedResidues)
+#
+#print(selectedResidues.start())
+#print(selectedResidues.stop())
+#print(vec_test)
 
 sys.exit()
+
+
+
 
 neighbors = pyrosetta.rosetta.core.select.residue_selector.NeighborhoodResidueSelector() # not neighbors of those guys
 neighbors.set_focus() # here give it your input residues as a boolean
