@@ -49,17 +49,37 @@ DF_selector = pyrosetta.rosetta.core.select.residue_selector.ChainSelector('D,E,
 #combine the chain selectors with the region selectors
 combine_H_selectors = pyrosetta.rosetta.core.select.residue_selector.AND_combine(antigen_helix_neighbor_selector, H_selector)
 H_residues_to_design = combine_H_selectors.apply(fa_working)
+print_vector_residues(H_residues_to_design)
 combine_DF_selectors = pyrosetta.rosetta.core.select.residue_selector.AND_combine(antigen_helix_neighbor_selector, DF_selector)
 antigen_residues_to_repack = combine_DF_selectors.apply(fa_working)
 
 """ Need to check for numbering information for the values calculated above,
-    I just worked to get the right selectors rather than the right results. """
+    I just tried to get the right selectors rather than the right results. """
 
-""" We need a section for loop design to patch the missing residues 
+""" We need a section for loop design to patch the missing loop residues 
     on the surface of the antigen """
-
-""" We need a section to set the task factories to design the protein 
-    and to repack the antigen interface """
 
 """ We may add a section to do alanine scanning before the protein residues
     are subjected to the design algorithm """
+
+""" We need a section to set two task factories: one to design the protein 
+    residues and another to repack/relax the antigen interface. 
+    Charlotte may work on this part if she was in during that lab. """
+
+""" We need to decide on what design method to use and what weights/parameters 
+    should go with that design method. One particular consideration is alanine 
+    overrepresentation we encountered yesterday. """
+    
+""" We will need help regarding how many runs of design/relax/repacking will be 
+    necessary for a work of this scale. We will also need to find good selection
+    criteria to accept/reject the resulting mutants. """
+
+""" We may add a protein-protein docking section for result validation. I'm
+    still not convinced that there's no streamlined method for protein docking,
+    otherwise why would people even use Rosetta? """
+
+""" We may need a series of functions to generate user-friendly and clear 
+    output files at the different steps of the calculations. """
+    
+""" There may be experimental mutation data available for comparison with our
+    results if you feel particularly adventurous. """ 
