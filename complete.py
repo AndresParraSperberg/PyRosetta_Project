@@ -71,16 +71,8 @@ pymol.apply(fa_working)
 # (dock mcm protocol, get interface residues)
 # interface energy optimization
 
-#from fast_relax_function import *
-#fast_relax(fa_working, fast_relax_rounds=1)
-
-##########################
-# CreateGlycanSequonMover
-# Glycosylate mover
-# man5
-# glycan tree modeler
-# sugarcoat
-##########################
+from fast_relax_function import *
+fast_relax(fa_working, fast_relax_rounds=1)
 
 ##################################################################
 ################### DOCK PROTEIN #################################

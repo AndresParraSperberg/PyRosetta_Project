@@ -2,6 +2,7 @@
 from pyrosetta import *
 init()
 
+
 ###########################################################
 #User defined functions go here. Use two spaces after each function.
 def print_vector_residues(bool_vec):
@@ -13,7 +14,6 @@ def print_vector_residues(bool_vec):
             residue_list.append(i)
 
     print("The residues belonging to the set are: {}".format(residue_list))
-
 
 ###########################################################
 # import and clean pdb (superantigen + TCR + MHC)
@@ -90,6 +90,7 @@ mm.set_jump(True)
 
 ############################################################
 # setup fast design
+scorefxn = pyrosetta.create_score_function("ref2015_cart.wts")
 fast_design = pyrosetta.rosetta.protocols.denovo_design.movers.FastDesign(scorefxn_in=scorefxn, standard_repeats=1)
 fast_design.cartesian(True)
 fast_design.set_task_factory(tf)
@@ -97,54 +98,5 @@ fast_design.set_movemap(mm)
 fast_design.minimize_bond_angles(True)
 fast_design.minimize_bond_lengths(True)
 
-# misc....
-loopThrough = pyrosetta.rosetta.core.select.get_residues_from_subset(combine_DF_selectors.apply(fa_working))
-for index in loopThrough:
-  print(fa_working.pdb_info().pose2pdb(index))
 
 
-
-
-ed
-""" We need a section for loop design to patch the missing loop residues
-    on the surface of the antigen """
-
-""" We may add a section to do alanine scanning before the protein residues
-    are subjected to the design algorithm """
-
-
-""" We neto decide on what design method to use and what weights/parameters
-    should go with that design method. One particular consideration is alanine
-    overrepresentation we encountered yesterday. """
-
-""" We will need help regarding how many runs of design/relax/repacking will be
-    necessary for a work of this scale. We will also need to find good selection
-    criteria to accept/reject the resulting mutants. """
-
-""" We may add a protein-protein docking section for result validation. I'm
-    still not convinced that there's no streamlined method for protein docking,
-    otherwise why would people even use Rosetta? """
-
-""" We may need a series of functions to generate user-friendly and clear
-    output files at the different steps of the calculations. """
-
-""" There may be experimental mutation data available for comparison with our
-    results if you feel particularly adventurous. """
-
-
-'''
-
-
-
-# Disable design
-tf.push_back(pyrosetta.rosetta.core.pack.task.operation.OperateOnResidueSubset(
-    pyrosetta.rosetta.core.pack.task.operation.RestrictToRepackingRLT(), not_neighbors))
-
-# Enable design on chain_A_cys_res
-# THIS IS WHAT REPLACES THE RESFILE...
-aa_to_design = pyrosetta.rosetta.core.pack.task.operation.RestrictAbsentCanonicalAASRLT()
-aa_to_design.aas_to_keep("ADEFGHIKLMNPQRSTVWY")
-tf.push_back(pyrosetta.rosetta.core.pack.task.operation.OperateOnResidueSubset(
-    aa_to_design, chain_A_cys_res))
-
-'''
