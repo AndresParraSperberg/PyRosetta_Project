@@ -15,6 +15,17 @@ def print_vector_residues(bool_vec):
     print("The residues belonging to the set are: {}".format(residue_list))
 
 
+def humanize(residue_set):
+    human_readable_list = []
+    counter = 1
+    for res in residue_set:
+        if res == True:
+            human_readable_list.append(counter)
+        counter = counter + 1
+    return human_readable_list
+
+
+
 ###########################################################
 # import and clean pdb (superantigen + TCR + MHC)
 from pyrosetta.toolbox import cleanATOM
@@ -52,6 +63,66 @@ H_residues_to_design = combine_H_selectors.apply(fa_working)
 print_vector_residues(H_residues_to_design)
 combine_DF_selectors = pyrosetta.rosetta.core.select.residue_selector.AND_combine(antigen_helix_neighbor_selector, DF_selector)
 antigen_residues_to_repack = combine_DF_selectors.apply(fa_working)
+
+############################################################
+#Alanine scanner
+############################################################
+""" 1) TF to mutate the selected protein residues to alanine
+    2) Limit antigen surface residues to repacking
+    3) Score and calculate the ddG at each position
+"""
+
+#these selectors will change in the real script
+all_residue_selector = pyrosetta.rosetta.core.select.residue_selector.ResidueIndexSelector()
+all_residue_selector.set_index('1-{}'.format(len(fa_working.sequence())))
+all_residues = all_residue_selector.apply(fa_working)
+
+#mutate the residue to alanine    
+sfxn = get_fa_scorefxn()
+fast_relax = pyrosetta.rosetta.protocols.relax.FastRelax(standard_repeats=2)
+fast_relax.set_scorefxn(sfxn)
+
+""" Fix the FastRelax and the ala scan is good """
+
+from pyrosetta.toolbox import mutate_residue
+for member in humanize(H_residues_to_design):
+    #define the movers
+    TF = pyrosetta.rosetta.core.pack.task.TaskFactory()    
+    #create pose copies
+    mutant_pose = fa_working.clone()
+    wt_pose = fa_working.clone()
+    
+    #make the alanine mutation at a single position
+    mutate_residue(mutant_pose, member, 'A')
+    mutation_site_selector = pyrosetta.rosetta.core.select.residue_selector.ResidueIndexSelector('{}'.format(member))
+    mutation_site = mutation_site_selector.apply(mutant_pose)
+    #select neighbors
+    neighbor_selector = pyrosetta.rosetta.core.select.residue_selector.NeighborhoodResidueSelector()
+    neighbor_selector.set_distance(6.0)
+    neighbor_selector.set_focus(mutation_site)
+    neighbors = neighbor_selector.apply(mutant_pose)
+    #select not neighbors
+    not_neighbor_selector = pyrosetta.rosetta.core.select.residue_selector.NotResidueSelector(neighbor_selector)
+    not_neighbors = not_neighbor_selector.apply(mutant_pose)
+    #defining the operations
+    to_relax = pyrosetta.rosetta.core.pack.task.operation.OperateOnResidueSubset(pyrosetta.rosetta.core.pack.task.operation.RestrictToRepackingRLT(), neighbors)
+    not_to_relax = pyrosetta.rosetta.core.pack.task.operation.OperateOnResidueSubset(pyrosetta.rosetta.core.pack.task.operation.PreventRepackingRLT(), not_neighbors)    
+    TF.push_back(to_relax)
+    TF.push_back(not_to_relax)
+    fast_relax.set_task_factory(TF)
+    fast_relax.apply(mutant_pose)
+    fast_relax.apply(wt_pose)
+    print("The score difference between the A mutant at the position {} ".format(member) + 
+          "is: {}.".format(sfxn(mutant_pose) - sfxn(wt_pose)))
+    
+    
+ 
+
+           
+#print(res)
+#mutate_residue()
+
+
 
 """ Need to check for numbering information for the values calculated above,
     I just tried to get the right selectors rather than the right results. """
